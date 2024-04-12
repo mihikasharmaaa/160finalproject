@@ -1,10 +1,28 @@
 # 160finalproject
-## Getting Started
-Install dependencies:
+
+
+To run the web app front-end, follow these steps:
+
+Linux and macOS:
+
+```bash
+git clone https://github.com/mihikasharmaaa/160finalproject.git
+
+cd 160finalproject
+
+npm install
+
+## to view the web app
+npm run start
+
+```
+To run the web app back-end, follow these steps:
+
 ```
 pip3 install -r requirements.txt
 ```
 Start the server:
+
 ```
 python3 -m uvicorn main:app --reload
 ```
