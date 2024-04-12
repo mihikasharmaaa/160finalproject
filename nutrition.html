@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutrition Guide</title>
+<style>
+  .nutrition-guide {
+    margin: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .nutrition-guide .input-group {
+    margin: 10px 0;
+  }
+  .nutrition-guide input,
+  .nutrition-guide button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  .nutrition-guide button {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  .nutrition-guide .result,
+  .nutrition-guide .reminder {
+    margin: 10px 0;
+    border-radius: 5px;
+  }
+  .nutrition-guide .reminder button {
+    margin: 0; /* Resetting margin for the button inside the reminder */
+  }
+
+  .nav-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    padding: 10px 0;
+  }
+  .nav-bar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #333;
+    font-size: 12px;
+  }
+  .nav-bar img {
+    width: 24px;
+    height: 24px;
+  }
+  .active-nav {
+    color: #007bff;
+  }
+</style>
+</head>
+<body>
+
+    <div class="nutrition-guide">
+    <h2>Nutrition Guide</h2>
+    <div class="input-group">
+        <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">Enter cat details</div>
+        <input type="text" placeholder="age">
+        <input type="text" placeholder="weight">
+        <button onclick="getNutritionSuggestion()">Check</button>
+    </div>
+    
+    <div id="nutrition-suggestion-block">
+        <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">Nutrition Suggestion</div>
+        <div id="nutrition-suggestion-placeholder" style="min-height: 100px; border: 1px solid #ababab; border-radius: 8px; ">
+            <!-- Placeholder for nutrition suggestion -->
+        </div>
+    </div>
+
+    <div class="reminder">
+        <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">Current Reminder</div>
+        <div id="reminder-content">
+            <span id="no-reminder-text" style="color: #ababab;">No reminder</span>
+            <div id="reminder-details" style="display: none;">
+                <!-- Reminder details will be shown here -->
+            </div>
+        </div>
+        <button id="edit-reminder-button" onclick="editReminder()">Edit</button>
+    </div>
+    
+    <div id="edit-reminder" style="display: none;">
+        <input type="date" id="reminder-date" lang="en">
+        <textarea id="reminder-note" placeholder="Enter a note for the reminder..."></textarea>
+        <button onclick="cancelEdit()" style="background-color: #f44336; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+        <button onclick="confirmEdit()" style="background-color: #4CAF50; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; ">Confirm</button>
+    </div>
+
+    </div>
+
+    <div class="nav-bar">
+    <a href="index.html" class="active-nav">
+        <svg t="1712947040597" class="icon" viewBox="0 0 1040 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7897" width="40" height="40"><path d="M1020.076628 500.229885 519.846743 0 19.616858 500.229885c-15.693487 15.693487-15.693487 39.233716 0 54.927203 15.693487 15.693487 39.233716 15.693487 54.927203 0l56.888889-56.888889 3.923372 474.727969c0 27.463602 23.54023 51.003831 51.003831 51.003831l665.011494 0c27.463602 0 51.003831-23.54023 51.003831-51.003831l5.885057-472.766284 56.888889 56.888889c7.846743 7.846743 17.655172 11.770115 27.463602 11.770115 9.808429 0 19.616858-3.923372 27.463602-11.770115C1033.808429 539.463602 1033.808429 515.923372 1020.076628 500.229885zM602.237548 980.842912l-162.819923 0 0-162.819923c0-17.655172 23.54023-41.195402 41.195402-41.195402l82.390805 0c17.655172 0 41.195402 23.54023 41.195402 41.195402L604.199234 980.842912z" p-id="7898"></path></svg>
+        <p>Home</p>
+    </a>
+    </div>
+
+    <script>
+        function getNutritionSuggestion() {
+          var age = document.getElementById('cat-age').value;
+          var weight = document.getElementById('cat-weight').value;
+          var prompt = `Please provide a nutrition suggestion for a cat with age: ${age} and weight: ${weight}.`;
+        
+          // You would make an API call to your server here, and your server would talk to the ChatGPT API.
+          // Below is a pseudo-function to illustrate the process:
+          sendPromptToServer(prompt, function(response) {
+            // This is where you would handle the actual response from your server
+            document.getElementById('nutrition-suggestion').textContent = response;
+          });
+        }
+        
+        // Mock function to simulate server API call
+        function sendPromptToServer(prompt, callback) {
+          console.log('Sending prompt to server:', prompt);
+          // Simulate a server response after a delay
+          setTimeout(function() {
+            var fakeServerResponse = "Based on the age and weight, your cat should have a diet rich in protein with moderate fat and low carbohydrates. Wet food can be beneficial for hydration.";
+            callback(fakeServerResponse);
+          }, 1500);
+        }
+
+        function editReminder() {
+            // Show the date picker and note input
+            document.getElementById('edit-reminder').style.display = 'block';
+            // Hide the 'Edit' button
+            document.getElementById('edit-reminder-button').style.display = 'none';
+            // Hide the no reminder text
+            document.getElementById('no-reminder-text').style.display = 'none';
+        }
+
+        function cancelEdit() {
+            // Hide the date picker and note input
+            document.getElementById('edit-reminder').style.display = 'none';
+            // Show the 'Edit' button
+            document.getElementById('edit-reminder-button').style.display = 'block';
+            // If no reminder is set, show the no reminder text
+            if (!document.getElementById('reminder-details').textContent.trim()) {
+                document.getElementById('no-reminder-text').style.display = 'block';
+            }
+        }
+
+        function confirmEdit() {
+            // Hide the edit inputs
+            document.getElementById('edit-reminder').style.display = 'none';
+            // Show the 'Edit' button
+            document.getElementById('edit-reminder-button').style.display = 'block';
+            // Get the entered date and note
+            var date = document.getElementById('reminder-date').value;
+            var note = document.getElementById('reminder-note').value;
+            // Update the reminder details
+            if (date || note) {
+                document.getElementById('reminder-details').innerHTML = 
+                `<strong>Date:</strong> ${date} <br> <strong>Note:</strong> ${note}`;
+                document.getElementById('reminder-details').style.display = 'block';
+            } else {
+                document.getElementById('no-reminder-text').style.display = 'block';
+            }
+            // Clear the input fields
+            document.getElementById('reminder-date').value = '';
+            document.getElementById('reminder-note').value = '';
+        }
+    </script>
+
+    
+</body>
+
+</html>
