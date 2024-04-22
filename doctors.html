@@ -45,7 +45,7 @@
   }
   
   .appointment-details {
-    display: none; /* Initially hidden */
+    display: none; 
     padding: 10px;
     margin-top: 10px;
     background-color: #f8f9fa;
@@ -90,7 +90,6 @@
     margin-bottom: 10px;
   }
 
-  /* Highlight the current day */
   .today {
     background-color: #007bff;
     color: white;
@@ -176,7 +175,7 @@ let selectedDate = null;
 
 // Define current date components
 let currentYear = new Date().getFullYear();
-let currentMonth = new Date().getMonth(); // January is 0!
+let currentMonth = new Date().getMonth(); // January is 0
 
 // Function to handle month navigation
 function changeMonth(change) {
@@ -257,7 +256,6 @@ function toggleAppointmentDetails(show) {
 
 function confirmAppointment() {
   // Save appointment details here
-  // For now, we'll just log to the console
   const date = document.getElementById('appointment-date').value;
   const time = document.getElementById('appointment-time').value;
   const location = document.getElementById('appointment-location').value;
