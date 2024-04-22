@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grooming Reminder</title>
+<style>
+  
+  .grooming-container {
+    margin: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  
+  .grooming-container input,
+  .grooming-container select {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: calc(100% - 22px); /* accounting for padding and border */
+  }
+  
+  .button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+  }
+  
+  .button-gray {
+    background-color: #6c757d;
+  }
+
+  .button-add {
+    background-color: #28a745;
+  }
+
+  .hidden {
+    display: none;
+  }
+  
+  .reminder-item {
+    background: #e9ecef;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .reminder-item svg {
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<!-- need to find a way to save the added reminders even after leaving the page-->
+<!-- also need to add actual reminders somehow based on these inputted ones -->
+<div class="grooming-container">
+  <h2>Grooming Reminders</h2>
+  <div id="reminder-list">
+    <!-- reminders will go here once added -->
+  </div>
+  <button class="button button-add" onclick="toggleAddReminder(true)">Add</button>
+</div>
+
+<div class="grooming-container hidden" id="add-reminder-form">
+  <h2>Add Reminder</h2>
+  <input type="text" id="reminder-name" placeholder="Reminder" value="Weekly Groom">
+  <input type="time" id="reminder-time">
+  <select id="reminder-frequency">
+    <option value="7">Every 1 Week</option>
+    <option value="14">Every 2 Weeks</option>
+    <option value="21">Every 3 Weeks</option>
+    <option value="28">Every 4 Weeks</option>
+  </select>
+  <button class="button" onclick="saveReminder()">Add</button>
+  <button class="button button-gray" onclick="toggleAddReminder(false)">Cancel</button>
+</div>
+
+<script>
+function toggleAddReminder(show) {
+  document.getElementById('add-reminder-form').style.display = show ? 'block' : 'none';
+}
+
+function saveReminder() {
+  var reminderName = document.getElementById('reminder-name').value;
+  var reminderTime = document.getElementById('reminder-time').value;
+  var reminderFrequency = document.getElementById('reminder-frequency').value;
+  
+  var reminderList = document.getElementById('reminder-list');
+  var reminderItem = document.createElement('div');
+  reminderItem.className = 'reminder-item';
+  reminderItem.innerHTML = `
+    <span>${reminderName} - ${reminderTime} - Every ${reminderFrequency} Days</span>
+    <svg onclick="removeReminder(this)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  `;
+  reminderList.appendChild(reminderItem);
+  toggleAddReminder(false); // hide after saving
+}
+
+function removeReminder(element) {
+  element.parentElement.remove();
+}
+</script>
+</body>
+</html>
