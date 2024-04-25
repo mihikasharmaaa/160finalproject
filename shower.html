@@ -129,7 +129,7 @@
 
 </style>
 </head>
-<body>
+<body style="background-color: #71cdd9;">
 <div class="appointment-container">
     <h2>Pet Shower Scheduler</h2>
   <div class="calendar-nav">
@@ -269,6 +269,27 @@ window.onload = function() {
     displayReminders();
 }
 
+function checkReminders() {
+    const now = new Date();
+    const reminders = JSON.parse(localStorage.getItem('showerReminders')) || [];
+    reminders.forEach((reminder, index) => {
+        const reminderTime = new Date(reminder.dateTime);
+        if (reminderTime <= now && !reminder.notified) {
+            alert(`Reminder: ${reminder.date} at ${reminder.time} - ${reminder.notes}`);
+            reminder.notified = true; // Mark as notified to prevent multiple alerts
+            reminders[index] = reminder; // Update the reminder in the array
+        }
+    });
+    localStorage.setItem('showerReminders', JSON.stringify(reminders)); // Save updates
+}
+
+// Setup the interval to check reminders every minute
+setInterval(checkReminders, 60000);
+
+window.onload = function() {
+    displayReminders();
+    checkReminders(); // Also run on load to catch any past due reminders since last visit
+}
 
 </script>
 

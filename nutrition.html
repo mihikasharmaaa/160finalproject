@@ -35,7 +35,7 @@
     border-radius: 5px;
   }
   .nutrition-guide .reminder button {
-    margin: 0; /* Resetting margin for the button inside the reminder */
+    margin: 0;
   }
 
   .nav-bar {
@@ -67,22 +67,22 @@
   }
 </style>
 </head>
-<body>
+<body style="background-color: #71cdd9;">
 
     <div class="nutrition-guide">
     <h2>Nutrition Guide</h2>
+
     <div class="input-group">
-        <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">Enter cat details</div>
-        <input type="text" placeholder="age">
-        <input type="text" placeholder="weight">
-        <button onclick="getNutritionSuggestion()">Check</button>
+      <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">Enter cat details</div>
+      <input id="cat-age" type="text" placeholder="age">
+      <input id="cat-weight" type="text" placeholder="weight">
+      <button id="check-button" onclick="getNutritionSuggestion()">Check</button>
     </div>
     
     <div id="nutrition-suggestion-block">
-        <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">Nutrition Suggestion</div>
-        <div id="nutrition-suggestion-placeholder" style="min-height: 100px; border: 1px solid #ababab; border-radius: 8px; ">
-            <!-- Placeholder for nutrition suggestion -->
-        </div>
+      <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px;">Nutrition Suggestion</div>
+      <div id="nutrition-suggestion-placeholder" style="min-height: 100px; border: 1px solid #ababab; border-radius: 8px; ">
+      </div>
     </div>
 
     <div class="reminder">
@@ -90,7 +90,6 @@
         <div id="reminder-content">
             <span id="no-reminder-text" style="color: #ababab;">No reminder</span>
             <div id="reminder-details" style="display: none;">
-                <!-- Reminder details will be shown here -->
             </div>
         </div>
         <button id="edit-reminder-button" onclick="editReminder()">Edit</button>
@@ -113,23 +112,38 @@
     </div>
 
     <script>
-        function getNutritionSuggestion() {
-          var age = document.getElementById('cat-age').value;
-          var weight = document.getElementById('cat-weight').value;
-          var prompt = `Please provide a nutrition suggestion for a cat with age: ${age} and weight: ${weight}.`;
+      function getNutritionSuggestion() {
+        var age = document.getElementById('cat-age').value;
+        var weight = document.getElementById('cat-weight').value;
+        var prompt = `Please provide a nutrition suggestion for a cat with age: ${age} and weight: ${weight}.`;
+
+        var checkButton = document.getElementById('check-button');
+        checkButton.textContent = 'Loading...'; 
+        checkButton.disabled = true; 
+
+        fetch('http://localhost:3000/api/nutrition/recommendation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({prompt: prompt})
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('nutrition-suggestion-placeholder').textContent = data;
+            checkButton.textContent = 'Check'; 
+            checkButton.disabled = false; 
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            checkButton.textContent = 'Check';
+            checkButton.disabled = false; 
+        });
+    }
+      
         
-          // You would make an API call to your server here, and your server would talk to the ChatGPT API.
-          // Below is a pseudo-function to illustrate the process:
-          sendPromptToServer(prompt, function(response) {
-            // This is where you would handle the actual response from your server
-            document.getElementById('nutrition-suggestion').textContent = response;
-          });
-        }
-        
-        // Mock function to simulate server API call
         function sendPromptToServer(prompt, callback) {
           console.log('Sending prompt to server:', prompt);
-          // Simulate a server response after a delay
           setTimeout(function() {
             var fakeServerResponse = "Based on the age and weight, your cat should have a diet rich in protein with moderate fat and low carbohydrates. Wet food can be beneficial for hydration.";
             callback(fakeServerResponse);
@@ -137,34 +151,24 @@
         }
 
         function editReminder() {
-            // Show the date picker and note input
             document.getElementById('edit-reminder').style.display = 'block';
-            // Hide the 'Edit' button
             document.getElementById('edit-reminder-button').style.display = 'none';
-            // Hide the no reminder text
             document.getElementById('no-reminder-text').style.display = 'none';
         }
 
         function cancelEdit() {
-            // Hide the date picker and note input
             document.getElementById('edit-reminder').style.display = 'none';
-            // Show the 'Edit' button
             document.getElementById('edit-reminder-button').style.display = 'block';
-            // If no reminder is set, show the no reminder text
             if (!document.getElementById('reminder-details').textContent.trim()) {
                 document.getElementById('no-reminder-text').style.display = 'block';
             }
         }
 
         function confirmEdit() {
-            // Hide the edit inputs
-            document.getElementById('edit-reminder').style.display = 'none';
-            // Show the 'Edit' button
+         document.getElementById('edit-reminder').style.display = 'none';
             document.getElementById('edit-reminder-button').style.display = 'block';
-            // Get the entered date and note
             var date = document.getElementById('reminder-date').value;
             var note = document.getElementById('reminder-note').value;
-            // Update the reminder details
             if (date || note) {
                 document.getElementById('reminder-details').innerHTML = 
                 `<strong>Date:</strong> ${date} <br> <strong>Note:</strong> ${note}`;
@@ -172,13 +176,10 @@
             } else {
                 document.getElementById('no-reminder-text').style.display = 'block';
             }
-            // Clear the input fields
             document.getElementById('reminder-date').value = '';
             document.getElementById('reminder-note').value = '';
         }
     </script>
-
-    
 </body>
 
 </html>
