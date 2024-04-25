@@ -226,40 +226,50 @@ function toggleAppointmentDetails(show) {
 }
 
 function confirmAppointment() {
-  const date = document.getElementById('appointment-date').value;
-  const time = document.getElementById('appointment-time').value;
-  const location = document.getElementById('appointment-location').value;
-  const notes = document.getElementById('appointment-notes').value;
-  
-  const reminderInfo = { date, time, location, notes };
-  localStorage.setItem('showerReminder', JSON.stringify(reminderInfo));
-  
-  displayReminder();
-  toggleAppointmentDetails(false);
+    const date = document.getElementById('appointment-date').value;
+    const time = document.getElementById('appointment-time').value;
+    const location = document.getElementById('appointment-location').value;
+    const notes = document.getElementById('appointment-notes').value;
+    
+    const newReminder = { date, time, location, notes, dateTime: new Date(`${date} ${time}`) };
+    let reminders = JSON.parse(localStorage.getItem('showerReminders')) || [];
+    reminders.push(newReminder);
+    reminders.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+    localStorage.setItem('showerReminders', JSON.stringify(reminders));
+    
+    displayReminders();
+    toggleAppointmentDetails(false);
 }
 
-function displayReminder() {
-  const reminderInfo = JSON.parse(localStorage.getItem('showerReminder'));
-  if (reminderInfo) {
+function displayReminders() {
+    const reminders = JSON.parse(localStorage.getItem('showerReminders')) || [];
     const reminderBox = document.getElementById('reminder-box');
-    reminderBox.innerHTML = `<h3>Your Reminder</h3>
-                             <p>Date: ${reminderInfo.date}</p>
-                             <p>Time: ${reminderInfo.time}</p>
-                             <p>Location: ${reminderInfo.location}</p>
-                             <p>Notes: ${reminderInfo.notes}</p>
-                             <button onclick="deleteReminder()">Delete Reminder</button>`;
-    reminderBox.classList.remove('hidden');
-  }
+    reminderBox.innerHTML = '<h3>Your Reminders</h3>';
+    reminders.forEach((reminder, index) => {
+        const backgroundColor = index % 2 === 0 ? '#f0f8ff' : '#e6e6fa'; // Alternate colors
+        reminderBox.innerHTML += `<div id="reminder-${index}" style="background-color: ${backgroundColor}; padding: 10px; margin: 5px; border-radius: 5px;">
+                                   <p><strong>Date:</strong> ${reminder.date}</p>
+                                   <p><strong>Time:</strong> ${reminder.time}</p>
+                                   <p><strong>Location:</strong> ${reminder.location}</p>
+                                   <p><strong>Notes:</strong> ${reminder.notes}</p>
+                                   <button onclick="deleteReminder(${index})">Delete Reminder</button>
+                                  </div>`;
+    });
+    reminderBox.classList.toggle('hidden', reminders.length === 0);
 }
 
-function deleteReminder() {
-  localStorage.removeItem('showerReminder');
-  document.getElementById('reminder-box').classList.add('hidden');
+function deleteReminder(index) {
+    let reminders = JSON.parse(localStorage.getItem('showerReminders')) || [];
+    reminders.splice(index, 1);
+    localStorage.setItem('showerReminders', JSON.stringify(reminders));
+    displayReminders();
 }
 
 window.onload = function() {
-  displayReminder();
+    displayReminders();
 }
+
+
 </script>
 
 </body>
