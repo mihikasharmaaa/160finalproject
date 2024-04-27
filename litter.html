@@ -4,8 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Litter Cleaning Reminder</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <style>
+  body {
+    background-color: #f4f4f9; /* Light background for better readability */
+    font-family: 'Arial', sans-serif; /* Consistent font for better readability */
+  }
   
+  .container {
+    padding-top: 20px;
+  }
+  
+  .card-header {
+    background-color: #007bff; /* Bootstrap primary color for headers */
+    color: white;
+  }
+  
+  .button-add {
+    background-color: #28a745; /* Bootstrap success color */
+  }
+  
+  .button-confirm, .button-cancel {
+    width: 48%; /* Adjusted width for side-by-side buttons */
+  }
+  
+  .nav-bar {
+    background-color: #fff; /* White background for navbar */
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1); /* Subtle shadow for floating effect */
+  }
+
+  .nav-link {
+    color: #007bff; /* Bootstrap primary color for active state */
+  }
   .litter-container {
     margin: 20px;
     padding: 20px;
@@ -63,58 +93,217 @@
   .reminder-item svg {
     cursor: pointer;
   }
+
+  .button-confirm {
+  background-color: #28a745; /* Green color for confirm */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 45%; /* Slightly less than half to fit side by side */
+}
+
+.button-cancel {
+  background-color: #dc3545; /* Red color for cancel */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 45%; /* Slightly less than half to fit side by side */
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    padding: 10px 0;
+  }
+.nav-bar a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #333;
+  font-size: 12px;
+}
+.nav-bar img {
+  width: 24px;
+  height: 24px;
+}
+.active-nav {
+  color: #007bff;
+}
 </style>
 </head>
 <body>
 <!-- need to find a way to save the added reminders even after leaving the page-->
 <!-- also need to add actual reminders somehow based on these inputted ones -->
-<div class="litter-container">
-  <h2>Litter Cleaning Reminders</h2>
-  <div id="reminder-list">
-    <!-- reminders will go here once added -->
+<div class="container">
+  <div class="card">
+    <div class="card-header text-center">Litter Cleaning Reminders</div>
+    <div class="card-body">
+      <div id="reminder-list" class="mb-3"></div>
+      <button class="btn btn-success button-add" onclick="toggleAddReminder(true)">Add Reminder</button>
+    </div>
   </div>
-  <button class="button button-add" onclick="toggleAddReminder(true)">Add</button>
+
+  <div class="card hidden" id="add-reminder-form">
+    <div class="card-body">
+      <h5 class="card-title">Add Reminder</h5>
+      <input type="text" id="reminder-name" class="form-control mb-2" placeholder="Reminder">
+      <input type="time" id="reminder-time" class="form-control mb-2">
+      <select id="reminder-frequency" class="form-control mb-2">
+        <option value="24">Every 24 Hours</option>
+        <option value="12">Every 12 Hours</option>
+        <option value="6">Every 6 Hours</option>
+        <option value="8">Every 8 Hours</option>
+      </select>
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-primary button-confirm" onclick="saveReminder()">Confirm</button>
+        <button class="btn btn-danger button-cancel" onclick="toggleAddReminder(false)">Cancel</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="litter-container hidden" id="add-reminder-form">
-  <h2>Add Reminder</h2>
-  <input type="text" id="reminder-name" placeholder="Reminder" value="Weekly Litter Cleaning">
-  <input type="time" id="reminder-time">
-  <select id="reminder-frequency">
-    <option value="3">Twice a week</option>
-    <option value="7">Every 1 Week</option>
-    <option value="14">Every 2 Weeks</option>
-  </select>
-  <button class="button" onclick="saveReminder()">Add</button>
-  <button class="button button-gray" onclick="toggleAddReminder(false)">Cancel</button>
+<div class="nav-bar" >
+  <a href="index.html" class="active-nav">
+    <svg t="1712947040597" class="icon" viewBox="0 0 1040 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7897" width="40" height="40"><path d="M1020.076628 500.229885 519.846743 0 19.616858 500.229885c-15.693487 15.693487-15.693487 39.233716 0 54.927203 15.693487 15.693487 39.233716 15.693487 54.927203 0l56.888889-56.888889 3.923372 474.727969c0 27.463602 23.54023 51.003831 51.003831 51.003831l665.011494 0c27.463602 0 51.003831-23.54023 51.003831-51.003831l5.885057-472.766284 56.888889 56.888889c7.846743 7.846743 17.655172 11.770115 27.463602 11.770115 9.808429 0 19.616858-3.923372 27.463602-11.770115C1033.808429 539.463602 1033.808429 515.923372 1020.076628 500.229885zM602.237548 980.842912l-162.819923 0 0-162.819923c0-17.655172 23.54023-41.195402 41.195402-41.195402l82.390805 0c17.655172 0 41.195402 23.54023 41.195402 41.195402L604.199234 980.842912z" p-id="7898"></path></svg>
+    <p>Home</p>
+  </a>
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadReminders();  // Load reminders when the document is ready
+});
+
 function toggleAddReminder(show) {
-  document.getElementById('add-reminder-form').style.display = show ? 'block' : 'none';
+    var form = document.getElementById('add-reminder-form');
+    form.style.display = show ? 'block' : 'none';
+    if (show) {
+        // Reset the form values when showing the form
+        document.getElementById('reminder-name').value = '';
+        document.getElementById('reminder-time').value = '';
+        document.getElementById('reminder-frequency').selectedIndex = 0;
+    }
 }
 
 function saveReminder() {
-  var reminderName = document.getElementById('reminder-name').value;
-  var reminderTime = document.getElementById('reminder-time').value;
-  var reminderFrequency = document.getElementById('reminder-frequency').value;
-  
-  var reminderList = document.getElementById('reminder-list');
-  var reminderItem = document.createElement('div');
-  reminderItem.className = 'reminder-item';
-  reminderItem.innerHTML = `
-    <span>${reminderName} - ${reminderTime} - Every ${reminderFrequency} Days</span>
-    <svg onclick="removeReminder(this)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
-  `;
-  reminderList.appendChild(reminderItem);
-  toggleAddReminder(false); // hide after saving
+    var reminderName = document.getElementById('reminder-name').value;
+    var reminderTimeInput = document.getElementById('reminder-time').value; // This is in 24-hour format
+    var reminderFrequency = document.getElementById('reminder-frequency').value;
+
+    if (!reminderName || !reminderTimeInput) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    // Convert 24-hour time to 12-hour AM/PM time
+    var timeParts = reminderTimeInput.split(':');
+    var hours = parseInt(timeParts[0], 10);
+    var minutes = timeParts[1];
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    var reminderTime = hours + ':' + minutes + ' ' + ampm;
+
+    var reminder = {
+        name: reminderName,
+        time: reminderTime,
+        frequency: parseInt(reminderFrequency, 10) // Convert frequency to integer for calculations
+    };
+
+    saveReminderToLocal(reminder); // Save the reminder to local storage
+    addReminderToPage(reminder); // Add reminder to the page
+    scheduleReminder(reminder); // Schedule the reminder for alerts
+    toggleAddReminder(false); // Hide form after saving
+}
+
+function addReminderToPage(reminder) {
+    var reminderList = document.getElementById('reminder-list');
+    var reminderItem = document.createElement('div');
+    reminderItem.className = 'reminder-item';
+    reminderItem.innerHTML = `
+        <span>${reminder.name} - ${reminder.time} - Every ${reminder.frequency} Days</span>
+        <svg onclick="removeReminder(this)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    `;
+    reminderList.appendChild(reminderItem);
 }
 
 function removeReminder(element) {
-  element.parentElement.remove();
+    var item = element.parentElement;
+    item.remove();
+    removeFromLocal(item); // Remove from local storage
+}
+
+function loadReminders() {
+    var reminders = JSON.parse(localStorage.getItem('litterReminders')) || [];
+    reminders.forEach(function(reminder) {
+        addReminderToPage(reminder);
+        scheduleReminder(reminder);
+    });
+}
+
+function saveReminderToLocal(reminder) {
+    var reminders = JSON.parse(localStorage.getItem('litterReminders')) || [];
+    reminders.push(reminder);
+    localStorage.setItem('litterReminders', JSON.stringify(reminders));
+}
+
+function removeFromLocal(reminderElement) {
+    var reminders = JSON.parse(localStorage.getItem('litterReminders')) || [];
+    var reminderText = reminderElement.querySelector('span').textContent;
+    var newReminders = reminders.filter(r => {
+        var fullText = `${r.name} - ${r.time} - Every ${r.frequency} Days`;
+        return fullText !== reminderText;
+    });
+    localStorage.setItem('litterReminders', JSON.stringify(newReminders));
+}
+
+function scheduleReminder(reminder) {
+    const [time, period] = reminder.time.split(' ');
+    let [hours, minutes] = time.split(':');
+
+    // Convert hours back to 24-hour format for accurate timeout calculation
+    hours = parseInt(hours, 10);
+    if (period === 'PM' && hours < 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+
+    const reminderDate = new Date();
+    reminderDate.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    let delay = reminderDate.getTime() - now.getTime();
+    if (delay < 0) {
+        // If the time is in the past for today, schedule it for the next interval
+        delay += reminder.frequency * 86400000; // milliseconds in one day times frequency
+    }
+
+    setTimeout(function() {
+        alert('Reminder: ' + reminder.name + ' at ' + reminder.time);
+        // Re-schedule the reminder after showing the current one
+        scheduleReminder(reminder);
+    }, delay);
 }
 </script>
 </body>
