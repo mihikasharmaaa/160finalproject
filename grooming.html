@@ -3,37 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grooming Reminder</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<title>Grooming Reminders</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
   body {
-    background-color: #f4f4f9; /* Light and airy background color */
-    font-family: 'Arial', sans-serif; /* Modern font style */
+    font-family: 'Arial', sans-serif; /* Change font */
+    background-color: #f4f4f9; /* Lighter background */
+    padding-bottom: 80px;
   }
-
   .container {
     padding-top: 20px;
+    min-height: 100vh; /* This ensures it's at least as tall as the viewport */
+}
+
+  .card {
+    margin-bottom: 20px;
   }
 
   .card-header {
-    background-color: #6f42c1; /* Custom purple color for headers */
+    background-color: #007bff;
     color: white;
   }
 
-  .button-add {
-    background-color: #28a745; /* Bootstrap success color */
-  }
-
-  .button-confirm {
-    background-color: #007bff; /* Bootstrap primary color */
-  }
-
-  .button-cancel {
-    background-color: #dc3545; /* Bootstrap danger color */
-  }
-  
-  .nav-link {
-    color: #007bff; /* Bootstrap primary color for active state */
+  .button {
+    width: 100%;
   }
   .grooming-container {
     margin: 20px;
@@ -131,32 +124,35 @@
     background-color: #fff;
     box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
     padding: 10px 0;
+    z-index: 1000; /* High z-index to ensure it stays on top */
+}
+  .nav-bar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #333;
+    font-size: 12px;
   }
-.nav-bar a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: #333;
-  font-size: 12px;
-}
-.nav-bar img {
-  width: 24px;
-  height: 24px;
-}
-.active-nav {
-  color: #007bff;
-}
+  .nav-bar img {
+    width: 24px;
+    height: 24px;
+  }
+  .active-nav {
+    color: #007bff;
+  }
 </style>
 </head>
 <body>
+<!-- need to find a way to save the added reminders even after leaving the page-->
+<!-- also need to add actual reminders somehow based on these inputted ones -->
 <div class="container">
   <div class="card">
     <div class="card-header">Grooming Reminders</div>
     <div class="card-body">
-      <div id="reminder-list" class="mb-3"></div>
-      <button class="btn button-add btn-success" onclick="toggleAddReminder(true)">Add Reminder</button>
+      <div id="reminder-list"></div>
+      <button class="btn btn-primary button-add" onclick="toggleAddReminder(true)">Add Reminder</button>
     </div>
   </div>
 
@@ -166,17 +162,18 @@
       <input type="text" id="reminder-name" class="form-control mb-2" placeholder="Reminder">
       <input type="time" id="reminder-time" class="form-control mb-2">
       <select id="reminder-frequency" class="form-control mb-2">
-        <option value="7">Every Week</option>
-        <option value="14">Every 2 Weeks</option>
-        <option value="21">Every 3 Weeks</option>
-        <option value="28">Every 4 Weeks</option>
+        <option value="1">Every Day</option>
+        <option value="2">Every 2 Days</option>
+        <option value="3">Every 3 Days</option>
+        <option value="4">Every 4 Days</option>
       </select>
       <div class="d-flex justify-content-between">
-        <button class="btn button-confirm btn-primary" onclick="saveReminder()">Confirm</button>
-        <button class="btn button-cancel btn-danger" onclick="toggleAddReminder(false)">Cancel</button>
+        <button class="btn btn-success button-confirm" onclick="saveReminder()">Confirm</button>
+        <button class="btn btn-danger button-cancel" onclick="toggleAddReminder(false)">Cancel</button>
       </div>
     </div>
   </div>
+</div>
 
 <div class="nav-bar" >
   <a href="index.html" class="active-nav">
@@ -184,20 +181,28 @@
     <p>Home</p>
   </a>
 </div>
-  
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+  <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3">
+    <!-- Toasts will appear here -->
+  </div>
+</div>
+
+<audio id="alertSound" src="path/to/alert_sound.mp3"></audio> <!-- Replace with your alert sound file -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/bootstrap.min.js"></script>
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
-    loadReminders();  // Load reminders when the document is ready
+    loadReminders(); // Load reminders when the document is ready
 });
 
 function toggleAddReminder(show) {
     var form = document.getElementById('add-reminder-form');
     form.style.display = show ? 'block' : 'none';
     if (show) {
-        // Reset the form values when showing the form
         document.getElementById('reminder-name').value = '';
         document.getElementById('reminder-time').value = '';
         document.getElementById('reminder-frequency').selectedIndex = 0;
@@ -206,7 +211,7 @@ function toggleAddReminder(show) {
 
 function saveReminder() {
     var reminderName = document.getElementById('reminder-name').value;
-    var reminderTimeInput = document.getElementById('reminder-time').value;  // This is in 24-hour format
+    var reminderTimeInput = document.getElementById('reminder-time').value;
     var reminderFrequency = document.getElementById('reminder-frequency').value;
 
     if (!reminderName || !reminderTimeInput) {
@@ -214,19 +219,10 @@ function saveReminder() {
         return;
     }
 
-    // Convert 24-hour time to 12-hour AM/PM time
-    var timeParts = reminderTimeInput.split(':');
-    var hours = parseInt(timeParts[0], 10);
-    var minutes = timeParts[1];
-    var ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12;  // the hour '0' should be '12'
-    var reminderTime = hours + ':' + minutes + ' ' + ampm;
-
     var reminder = {
         name: reminderName,
-        time: reminderTime,
-        frequency: parseInt(reminderFrequency, 10)  // Store frequency as integer for easier calculations
+        time: reminderTimeInput,
+        frequency: reminderFrequency
     };
 
     saveReminderToLocal(reminder);
@@ -239,27 +235,26 @@ function addReminderToPage(reminder) {
     var reminderList = document.getElementById('reminder-list');
     var reminderItem = document.createElement('div');
     reminderItem.className = 'reminder-item';
+    const formattedTime = formatTime24To12(reminder.time);
     reminderItem.innerHTML = `
-        <span>${reminder.name} - ${reminder.time} - Every ${reminder.frequency} Days</span>
-        <svg onclick="removeReminder(this)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-    `;
+        <span>${reminder.name} - ${formattedTime} - Every ${reminder.frequency} Day(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="removeReminder(this.parentNode)">Remove</button>`;
     reminderList.appendChild(reminderItem);
 }
 
 function removeReminder(element) {
-    var item = element.parentElement;
-    item.remove();
-    removeFromLocal(item); // Remove from local storage
+    var reminders = JSON.parse(localStorage.getItem('groomingReminders')) || [];
+    var reminderName = element.children[0].textContent.split(' - ')[0]; // Assuming name is the first part before ' - '
+    var newReminders = reminders.filter(r => r.name !== reminderName);
+    localStorage.setItem('groomingReminders', JSON.stringify(newReminders));
+    element.remove(); // Remove from the DOM
 }
 
 function loadReminders() {
-    var reminders = JSON.parse(localStorage.getItem('groomingReminders')) || [];
-    reminders.forEach(function(reminder) {
+    const reminders = JSON.parse(localStorage.getItem('groomingReminders')) || [];
+    reminders.forEach(reminder => {
         addReminderToPage(reminder);
-        scheduleReminder(reminder);
+        scheduleReminder(reminder); // Schedule each reminder correctly based on its time and frequency
     });
 }
 
@@ -271,40 +266,70 @@ function saveReminderToLocal(reminder) {
 
 function removeFromLocal(reminderElement) {
     var reminders = JSON.parse(localStorage.getItem('groomingReminders')) || [];
-    var reminderText = reminderElement.querySelector('span').textContent;
-    var newReminders = reminders.filter(r => {
-        var fullText = `${r.name} - ${r.time} - Every ${r.frequency} Days`;
-        return fullText !== reminderText;
-    });
+    var reminderText = reminderElement.textContent;
+    var newReminders = reminders.filter(r => r.name !== reminderText);
     localStorage.setItem('groomingReminders', JSON.stringify(newReminders));
 }
 
 function scheduleReminder(reminder) {
-    const [time, period] = reminder.time.split(' ');
-    let [hours, minutes] = time.split(':');
-
-    // Convert hours back to 24-hour format for accurate timeout calculation
-    hours = parseInt(hours, 10);
-    if (period === 'PM' && hours < 12) hours += 12;
-    if (period === 'AM' && hours === 12) hours = 0;
-
-    const reminderDate = new Date();
-    reminderDate.setHours(hours, minutes, 0, 0);
-    reminderDate.setSeconds(0);
-
+    const nextTime = getNextReminderTime(reminder.time, reminder.frequency);
     const now = new Date();
-    let delay = reminderDate.getTime() - now.getTime();
-    if (delay < 0) {
-        // If the time is in the past for today, schedule it for the next interval
-        delay += reminder.frequency * 86400000; // milliseconds in one day times frequency
-    }
+    const delay = nextTime.getTime() - now.getTime();
 
-    setTimeout(function() {
-        alert('Reminder: ' + reminder.name + ' at ' + reminder.time);
-        // Re-schedule the reminder after showing the current one
-        scheduleReminder(reminder);
+    console.log('Scheduling reminder:', reminder.name, 'for', delay, 'milliseconds from now');
+
+    setTimeout(() => {
+        displayReminder(reminder);
+        scheduleReminder(reminder); // Reschedule for the next time
     }, delay);
 }
+
+function getNextReminderTime(time, frequency) {
+    const [hours, minutes] = time.split(':');
+    let nextTime = new Date();
+    nextTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+    while (nextTime < new Date()) {
+        nextTime.setDate(nextTime.getDate() + parseInt(frequency));
+    }
+
+    return nextTime;
+}
+
+function nextOccurrence(hours, minutes, frequency) {
+    const now = new Date();
+    let reminderDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+    
+    // Adjust the date to the next occurrence according to the frequency
+    while (reminderDate <= now) { // Ensure the reminder is in the future
+        reminderDate.setDate(reminderDate.getDate() + parseInt(frequency));
+    }
+    
+    return reminderDate;
+}
+
+function displayReminder(reminder) {
+    const formattedTime = formatTime24To12(reminder.time);
+    playSound();
+    setTimeout(() => {
+        alert(`Reminder: ${reminder.name} at ${formattedTime}`);
+    }, 100); // Delay alert by 100 milliseconds
+}
+
+function playSound() {
+    const audio = new Audio('alert.wav');
+    audio.play();
+}
+
+function formatTime24To12(timeStr) {
+    const [hours, minutes] = timeStr.split(':');
+    const hour = parseInt(hours);
+    const isPM = hour >= 12;
+    const adjustedHour = isPM ? hour - 12 : hour;
+    const formattedHour = adjustedHour === 0 ? 12 : adjustedHour; // Convert "00" hour to "12"
+    return `${formattedHour}:${minutes} ${isPM ? 'PM' : 'AM'}`;
+}
+
 </script>
 </body>
 </html>
